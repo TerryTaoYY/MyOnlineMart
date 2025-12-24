@@ -1,0 +1,76 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Order Management</h1>
+      <p class="page-subtitle">Complete or cancel orders as they move through fulfillment.</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  <div class="card">
+    <div class="page-header">
+      <h3>Orders</h3>
+      <button class="btn secondary" type="button" (click)="loadOrders()">Refresh</button>
+    </div>
+    @if (orders().length === 0) {
+      <div class="helper">No orders on this page.</div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Placed</th>
+            <th>Status</th>
+            <th>Buyer</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td>#{{ order.id }}</td>
+              <td>{{ formatDate(order.placedAt) }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.processing]="order.status === 'PROCESSING'"
+                  [class.completed]="order.status === 'COMPLETED'"
+                  [class.canceled]="order.status === 'CANCELED'"
+                >
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>{{ order.buyerUsername ?? '-' }}</td>
+              <td>
+                <div class="list" style="flex-direction: row; gap: 0.35rem;">
+                  <button class="btn tiny secondary" type="button" (click)="viewOrder(order.id)">
+                    View
+                  </button>
+                  <button
+                    class="btn tiny primary"
+                    type="button"
+                    [disabled]="order.status !== 'PROCESSING'"
+                    (click)="completeOrder(order.id)"
+                  >
+                    Complete
+                  </button>
+                  <button
+                    class="btn tiny ghost"
+                    type="button"
+                    [disabled]="order.status !== 'PROCESSING'"
+                    (click)="cancelOrder(order.id)"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</section>

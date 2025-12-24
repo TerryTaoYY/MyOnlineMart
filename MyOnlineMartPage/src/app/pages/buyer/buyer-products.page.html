@@ -1,0 +1,147 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Shop Products</h1>
+      <p class="page-subtitle">
+        Browse in-stock items, build a cart, and save items to your watchlist.
+      </p>
+    </div>
+    <button class="btn secondary" type="button" (click)="loadProducts()">Refresh</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  <div class="split">
+    <div class="card">
+      <div class="page-header">
+        <h3>Available Products</h3>
+        <span class="helper">In-stock items only</span>
+      </div>
+      @if (products().length === 0) {
+        <div class="helper">No products available.</div>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Retail</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of products(); track product.id) {
+              <tr>
+                <td>
+                  <a [routerLink]="['/buyer/products', product.id]">
+                    {{ product.description }}
+                  </a>
+                </td>
+                <td>{{ formatCurrency(product.retailPrice) }}</td>
+                <td>
+                  <div class="list" style="flex-direction: row; gap: 0.4rem;">
+                    <button class="btn tiny primary" type="button" (click)="addToCart(product)">
+                      Add to cart
+                    </button>
+                    <button
+                      class="btn tiny ghost"
+                      type="button"
+                      (click)="addToWatchlist(product.id)"
+                    >
+                      Watchlist
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="list">
+      <div class="card">
+        <div class="page-header">
+          <h3>Shopping Cart</h3>
+          <span class="helper">{{ cartItems().length }} items</span>
+        </div>
+        @if (cartItems().length === 0) {
+          <div class="helper">Your cart is empty.</div>
+        } @else {
+          <div class="list">
+            @for (item of cartItems(); track item.productId) {
+              <div class="list-item">
+                <div>
+                  <strong>{{ item.description }}</strong>
+                  <div class="helper">{{ formatCurrency(item.unitPrice) }}</div>
+                </div>
+                <div class="list" style="flex-direction: row; gap: 0.4rem; align-items: center;">
+                  <input
+                    class="input"
+                    type="number"
+                    min="1"
+                    [value]="item.quantity"
+                    (change)="updateQuantity(item.productId, $event)"
+                    style="width: 70px;"
+                  />
+                  <button
+                    class="btn tiny ghost"
+                    type="button"
+                    (click)="removeFromCart(item.productId)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="list-item" style="margin-top: 0.8rem;">
+            <span class="helper">Estimated total</span>
+            <span class="value">{{ formatCurrency(cartTotal()) }}</span>
+          </div>
+          <button class="btn primary" type="button" (click)="placeOrder()" [disabled]="isPlacing()">
+            Place Order
+          </button>
+        }
+      </div>
+
+      <div class="card">
+        <div class="page-header">
+          <h3>Watchlist</h3>
+          <button class="btn tiny ghost" type="button" (click)="loadWatchlist()">Refresh</button>
+        </div>
+        @if (watchlist().length === 0) {
+          <div class="helper">No items in watchlist.</div>
+        } @else {
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Retail</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of watchlist(); track item.id) {
+                <tr>
+                  <td>{{ item.description }}</td>
+                  <td>{{ formatCurrency(item.retailPrice) }}</td>
+                  <td>
+                    <button
+                      class="btn tiny ghost"
+                      type="button"
+                      (click)="removeFromWatchlist(item.id)"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+</section>

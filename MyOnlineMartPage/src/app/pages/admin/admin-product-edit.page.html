@@ -1,0 +1,42 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Edit Product</h1>
+      <p class="page-subtitle">Adjust pricing or inventory details.</p>
+    </div>
+    <a class="btn secondary" routerLink="/admin/products">Back to products</a>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (product()) {
+    <div class="card">
+      <h3>{{ product()!.description }}</h3>
+      <form class="form-grid" [formGroup]="productForm" (ngSubmit)="saveChanges()">
+        <label class="field">
+          Description
+          <input class="input" formControlName="description" />
+        </label>
+        <label class="field">
+          Wholesale Price
+          <input class="input" type="number" min="0" formControlName="wholesalePrice" />
+        </label>
+        <label class="field">
+          Retail Price
+          <input class="input" type="number" min="0" formControlName="retailPrice" />
+        </label>
+        <label class="field">
+          Stock Quantity
+          <input class="input" type="number" min="0" formControlName="stockQuantity" />
+        </label>
+        <button class="btn primary" type="submit" [disabled]="isSaving()">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  } @else if (isLoading()) {
+    <div class="helper">Loading product data...</div>
+  }
+</section>

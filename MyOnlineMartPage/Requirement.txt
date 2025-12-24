@@ -1,0 +1,52 @@
+Online Shopping App Front End Example
+
+To design the front end based on the requirements, here’s an example of how the pages could be structured and the components that can be implemented in an Angular application. Please note that this is just an example, and you can modify it as per your specific needs. You can customize the design, layout, and styling of each component as per your application's needs and preferences.
+
+
+The only requirement is creating an Angular application that utilizes all the endpoints. You can achieve this by presenting the information in a table format or by enabling interaction through buttons or forms.
+
+
+1. Login / Register Page:
+- Create a login form component with input fields for username and password.
+- Implement a registration form component with fields for user details.
+- Use appropriate Angular form validation and handle form submissions.
+
+2. User Home Page:
+- Develop a component to display a table of orders using Angular Material or any other UI library.
+- Add a Cancel button and a View button/link for each order to open the order detail page.
+- Create a component to show the top 3 most frequently purchased items and the top 3 most recently purchased items.
+
+3. Order Detail Page:
+- Design a component to display detailed information about an order, including order items.
+- Include a link or button to open the product detail page for each item.
+- Implement a Cancel button to allow users to cancel the order.
+
+4. Product Detail Page:
+- Develop a component to display detailed information about a specific product.
+- Retrieve the product information from the corresponding endpoint.
+
+5. Product Page:
+- Create a component to show a table of all products using Angular Material or other UI library.
+- Add an "Add to Shopping Cart" button and an "Add to Watchlist" button for each product.
+- Implement a shopping cart component to display added items.
+- Create a component to display a table of watchlists with a Remove button.
+
+6. Admin Home Page:
+- Develop a component to display a table of orders using Angular Material or other UI library.
+- Include Cancel, Complete, and View buttons for each order to perform respective actions.
+- Create a component to display information on the product that brings the most profit.
+- Develop a component to show the top 3 most popular/sold products.
+- Implement a component to display the total number of successfully sold items.
+
+7. Admin Product Management Page:
+- Create a component to show a table of all products using Angular Material or other UI library.
+- Include an Edit button for each product to open an edit product page.
+- Implement a View button to open a product detail page.
+- Develop a form component to add a new product.
+
+8. Admin Order Management Page:
+- Develop a component to display a table of all orders using Angular Material or other UI library.
+- Include Complete, Cancel, and View buttons for each order to perform respective actions.
+- Create a component to display the detailed information of an order on the order detail page.
+
+

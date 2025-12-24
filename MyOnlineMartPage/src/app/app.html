@@ -1,0 +1,37 @@
+<div class="app-shell">
+  <header class="app-nav">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div>
+        <div class="brand-title">My Online Mart</div>
+        <div class="brand-subtitle">Live orders, curated inventory</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      @if (isLoggedIn()) {
+        @if (role() === 'BUYER') {
+          <a routerLink="/buyer/products" routerLinkActive="active">Home</a>
+          <a routerLink="/buyer/orders" routerLinkActive="active">Orders</a>
+        } @else if (role() === 'ADMIN') {
+          <a routerLink="/admin" routerLinkActive="active">Admin Home</a>
+          <a routerLink="/admin/products" routerLinkActive="active">Product Mgmt</a>
+          <a routerLink="/admin/orders" routerLinkActive="active">Order Mgmt</a>
+        }
+      }
+    </nav>
+    <div class="nav-actions">
+      @if (isLoggedIn()) {
+        <div class="user-chip">
+          <span class="user-role">{{ role() }}</span>
+          <span class="user-name">{{ user()?.username }}</span>
+        </div>
+        <button class="btn ghost" type="button" (click)="logout()">Logout</button>
+      } @else {
+        <a class="btn primary" routerLink="/login">Sign In</a>
+      }
+    </div>
+  </header>
+  <main class="app-content">
+    <router-outlet />
+  </main>
+</div>

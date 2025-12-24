@@ -1,0 +1,103 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Order Detail</h1>
+      <p class="page-subtitle">Review the order summary, status, and item pricing.</p>
+    </div>
+    <div class="list" style="flex-direction: row; gap: 0.6rem;">
+      <button
+        class="btn secondary"
+        type="button"
+        [disabled]="!order()"
+        (click)="refresh()"
+      >
+        Refresh
+      </button>
+      @if (isAdmin()) {
+        <button
+          class="btn primary"
+          type="button"
+          [disabled]="order()?.status !== 'PROCESSING'"
+          (click)="completeOrder()"
+        >
+          Complete
+        </button>
+      }
+      <button
+        class="btn ghost"
+        type="button"
+        [disabled]="order()?.status !== 'PROCESSING'"
+        (click)="cancelOrder()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (order()) {
+    <div class="card">
+      <div class="grid-3">
+        <div>
+          <div class="helper">Order ID</div>
+          <div class="value">#{{ order()!.id }}</div>
+        </div>
+        <div>
+          <div class="helper">Placed</div>
+          <div class="value">{{ formatDate(order()!.placedAt) }}</div>
+        </div>
+        <div>
+          <div class="helper">Status</div>
+          <span
+            class="badge"
+            [class.processing]="order()!.status === 'PROCESSING'"
+            [class.completed]="order()!.status === 'COMPLETED'"
+            [class.canceled]="order()!.status === 'CANCELED'"
+          >
+            {{ order()!.status }}
+          </span>
+        </div>
+      </div>
+
+      @if (adminOrder()?.buyerUsername) {
+        <div style="margin-top: 1rem;">
+          <div class="helper">Buyer</div>
+          <div class="value">{{ adminOrder()!.buyerUsername }}</div>
+        </div>
+      }
+
+      <div style="margin-top: 1.5rem;">
+        <h3>Items</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of order()!.items ?? []; track item.productId) {
+              <tr>
+                <td>
+                  <a [routerLink]="productLink(item.productId)">
+                    {{ item.description }}
+                  </a>
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ formatCurrency(item.unitRetailPrice) }}</td>
+                <td>{{ formatCurrency(item.unitRetailPrice * item.quantity) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else if (isLoading()) {
+    <div class="helper">Loading order details...</div>
+  }
+</section>

@@ -1,0 +1,41 @@
+.auth-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.9), rgba(239, 250, 246, 0.9));
+}
+
+.auth-note {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(47, 122, 109, 0.08);
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.tab {
+  padding: 0.6rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(25, 25, 36, 0.15);
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: rgba(255, 107, 74, 0.2);
+  border-color: rgba(255, 107, 74, 0.4);
+}

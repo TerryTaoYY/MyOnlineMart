@@ -1,0 +1,177 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Admin Overview</h1>
+      <p class="page-subtitle">
+        Review key performance indicators and keep order fulfillment on track.
+      </p>
+    </div>
+    <div class="list" style="flex-direction: row; gap: 0.6rem;">
+      <a class="btn secondary" routerLink="/admin/products">Manage products</a>
+      <button class="btn primary" type="button" (click)="loadData()">Refresh</button>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  <div class="grid-3">
+    <div class="stat-card">
+      <div class="stat-title">Profit Leader</div>
+      @if (profitSummary()) {
+        <div class="stat-value">
+          {{ profitSummary()!.description ?? ('Product #' + profitSummary()!.productId) }}
+        </div>
+        <div class="helper">
+          Profit: {{ profitSummary()!.profit ?? profitSummary()!.totalProfit ?? '-' }}
+        </div>
+      } @else {
+        <div class="helper">No data yet.</div>
+      }
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Total Items Sold</div>
+      <div class="stat-value">
+        {{ totalSold()?.totalItems ?? '-' }}
+      </div>
+      <div class="helper">Completed orders only</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Orders in Queue</div>
+      <div class="stat-value">{{ orders().length }}</div>
+      <div class="helper">Latest 5 orders</div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="card">
+      <div class="page-header">
+        <h3>Recent Orders</h3>
+        <a class="btn tiny ghost" routerLink="/admin/orders">Open order management</a>
+      </div>
+      @if (orders().length === 0) {
+        <div class="helper">No orders on this page.</div>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Placed</th>
+              <th>Status</th>
+              <th>Buyer</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of orders(); track order.id) {
+              <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ formatDate(order.placedAt) }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [class.processing]="order.status === 'PROCESSING'"
+                    [class.completed]="order.status === 'COMPLETED'"
+                    [class.canceled]="order.status === 'CANCELED'"
+                  >
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>{{ order.buyerUsername ?? '-' }}</td>
+                <td>
+                  <div class="list" style="flex-direction: row; gap: 0.35rem;">
+                    <button class="btn tiny secondary" type="button" (click)="viewOrder(order.id)">
+                      View
+                    </button>
+                    <button
+                      class="btn tiny primary"
+                      type="button"
+                      [disabled]="order.status !== 'PROCESSING'"
+                      (click)="completeOrder(order.id)"
+                    >
+                      Complete
+                    </button>
+                    <button
+                      class="btn tiny ghost"
+                      type="button"
+                      [disabled]="order.status !== 'PROCESSING'"
+                      (click)="cancelOrder(order.id)"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="list">
+      <div class="card">
+        <div class="page-header">
+          <h3>Listing Information</h3>
+          <a class="btn tiny ghost" routerLink="/admin/products">Open product management</a>
+        </div>
+        @if (products().length === 0) {
+          <div class="helper">No products available.</div>
+        } @else {
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Retail</th>
+                <th>Wholesale</th>
+                <th>Stock</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products(); track product.id) {
+                <tr>
+                  <td>{{ product.description }}</td>
+                  <td>{{ formatCurrency(product.retailPrice) }}</td>
+                  <td>{{ formatCurrency(product.wholesalePrice) }}</td>
+                  <td>{{ product.stockQuantity }}</td>
+                  <td>
+                    <div class="list" style="flex-direction: row; gap: 0.35rem;">
+                      <a class="btn tiny secondary" [routerLink]="['/admin/products', product.id]">
+                        View
+                      </a>
+                      <a
+                        class="btn tiny ghost"
+                        [routerLink]="['/admin/products', product.id, 'edit']"
+                      >
+                        Edit
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <div class="card">
+        <h3>Top 3 Popular Products</h3>
+        @if (popularProducts().length === 0) {
+          <div class="helper">No popular product data yet.</div>
+        } @else {
+          <div class="list">
+            @for (item of popularProducts(); track item.productId) {
+              <div class="list-item">
+                <div>
+                  <strong>{{ item.description ?? ('Product #' + item.productId) }}</strong>
+                  <div class="helper">Total sold: {{ item.totalQuantity ?? '-' }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

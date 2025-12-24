@@ -1,0 +1,109 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Welcome to My Online Mart</h1>
+      <p class="page-subtitle">
+        Sign in to manage orders, discover new arrivals, and keep tabs on inventory
+        performance in real time.
+      </p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="card auth-hero">
+      <h3>What you can do here</h3>
+      <div class="list">
+        <div class="list-item">
+          <div>
+            <strong>Buyer dashboards</strong>
+            <div class="helper">Track orders, build carts, and watch pricing shifts.</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div>
+            <strong>Admin insights</strong>
+            <div class="helper">Monitor profit leaders and manage order workflows.</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div>
+            <strong>Fast actions</strong>
+            <div class="helper">Cancel, complete, and review orders with one click.</div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-note">
+        Tip: Use the same credentials you registered with the API service.
+      </div>
+    </div>
+
+    <div class="card auth-card">
+      <div class="auth-tabs">
+        <button
+          class="tab"
+          type="button"
+          [class.active]="mode() === 'login'"
+          (click)="switchMode('login')"
+        >
+          Login
+        </button>
+        <button
+          class="tab"
+          type="button"
+          [class.active]="mode() === 'register'"
+          (click)="switchMode('register')"
+        >
+          Register
+        </button>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert">{{ errorMessage() }}</div>
+      }
+
+      @if (mode() === 'login') {
+        <form class="list" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+          <label class="field">
+            Username or Email
+            <input class="input" formControlName="usernameOrEmail" placeholder="buyer1" />
+          </label>
+          <label class="field">
+            Password
+            <input
+              class="input"
+              type="password"
+              formControlName="password"
+              placeholder="********"
+            />
+          </label>
+          <button class="btn primary" type="submit" [disabled]="isBusy()">
+            Sign In
+          </button>
+        </form>
+      } @else {
+        <form class="list" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+          <label class="field">
+            Username
+            <input class="input" formControlName="username" placeholder="buyer1" />
+          </label>
+          <label class="field">
+            Email
+            <input class="input" type="email" formControlName="email" placeholder="buyer1@example.com" />
+          </label>
+          <label class="field">
+            Password
+            <input
+              class="input"
+              type="password"
+              formControlName="password"
+              placeholder="Password123!"
+            />
+          </label>
+          <button class="btn primary" type="submit" [disabled]="isBusy()">
+            Create Account
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+</section>

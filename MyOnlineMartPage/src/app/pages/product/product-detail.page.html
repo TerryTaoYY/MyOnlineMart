@@ -1,0 +1,54 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Product Detail</h1>
+      <p class="page-subtitle">
+        {{
+          isAdmin()
+            ? 'Detailed pricing and stock information for this item.'
+            : 'Detailed pricing information for this item.'
+        }}
+      </p>
+    </div>
+    <div class="list" style="flex-direction: row; gap: 0.6rem;">
+      @if (isAdmin()) {
+        <a class="btn secondary" routerLink="/admin/products">Back to admin products</a>
+        @if (product()) {
+          <a class="btn primary" [routerLink]="['/admin/products', product()!.id, 'edit']">
+            Edit product
+          </a>
+        }
+      } @else {
+        <a class="btn secondary" routerLink="/buyer/products">Back to products</a>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (product()) {
+    <div class="card">
+      <h3>{{ product()!.description }}</h3>
+      <div class="grid-3">
+        <div>
+          <div class="helper">Retail Price</div>
+          <div class="value">{{ formatCurrency(product()!.retailPrice) }}</div>
+        </div>
+        @if (isAdmin()) {
+          <div>
+            <div class="helper">Wholesale Price</div>
+            <div class="value">{{ formatCurrency(adminProduct()!.wholesalePrice) }}</div>
+          </div>
+          <div>
+            <div class="helper">Stock Available</div>
+            <div class="value">{{ adminProduct()!.stockQuantity }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (isLoading()) {
+    <div class="helper">Loading product details...</div>
+  }
+</section>
