@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# IntelliJ / IDEA
+.idea/
+*.iml
+out/
+
+# Logs
+*.log
+
+# ---------- Backend: Spring Boot (Maven/Gradle) ----------
+# Maven
+MyOnlineMart/target/
+# Gradle（如用）
+MyOnlineMart/build/
+MyOnlineMart/.gradle/
+
+# ---------- Frontend: Angular / Node ----------
+MyOnlineMartPage/node_modules/
+MyOnlineMartPage/dist/
+MyOnlineMartPage/.angular/
+MyOnlineMartPage/.cache/
+
+# env files（按需）
+**/.env
