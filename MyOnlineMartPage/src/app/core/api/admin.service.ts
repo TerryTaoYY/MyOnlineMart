@@ -5,6 +5,7 @@ import { API_BASE_URL } from './api.config';
 import {
   AdminOrder,
   AdminProduct,
+  OrderStatusUpdate,
   PagedResponse,
   PopularProductSummary,
   ProfitSummary,
@@ -50,11 +51,17 @@ export class AdminService {
   }
 
   completeOrder(orderId: number) {
-    return this.http.patch<AdminOrder>(`${this.apiBase}/api/admin/orders/${orderId}/complete`, {});
+    return this.http.patch<OrderStatusUpdate>(
+      `${this.apiBase}/api/admin/orders/${orderId}/complete`,
+      {}
+    );
   }
 
   cancelOrder(orderId: number) {
-    return this.http.patch<AdminOrder>(`${this.apiBase}/api/admin/orders/${orderId}/cancel`, {});
+    return this.http.patch<OrderStatusUpdate>(
+      `${this.apiBase}/api/admin/orders/${orderId}/cancel`,
+      {}
+    );
   }
 
   getProfitSummary() {

@@ -6,6 +6,7 @@ import {
   BuyerOrderCreateRequest,
   BuyerOrderSummary,
   BuyerProduct,
+  OrderStatusUpdate,
   TopItem
 } from './api.models';
 
@@ -35,7 +36,10 @@ export class BuyerService {
   }
 
   cancelOrder(orderId: number) {
-    return this.http.patch<BuyerOrder>(`${this.apiBase}/api/buyer/orders/${orderId}/cancel`, {});
+    return this.http.patch<OrderStatusUpdate>(
+      `${this.apiBase}/api/buyer/orders/${orderId}/cancel`,
+      {}
+    );
   }
 
   getTopFrequent() {

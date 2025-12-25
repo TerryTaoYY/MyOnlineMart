@@ -24,7 +24,7 @@
           {{ profitSummary()!.description ?? ('Product #' + profitSummary()!.productId) }}
         </div>
         <div class="helper">
-          Profit: {{ profitSummary()!.profit ?? profitSummary()!.totalProfit ?? '-' }}
+          Profit: {{ formatProfit(profitSummary()!.totalProfit) }}
         </div>
       } @else {
         <div class="helper">No data yet.</div>

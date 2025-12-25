@@ -98,4 +98,11 @@ export class AdminHomePage {
   formatCurrency(value: number) {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
   }
+
+  formatProfit(value?: number | null) {
+    if (value == null) {
+      return '-';
+    }
+    return this.formatCurrency(value);
+  }
 }

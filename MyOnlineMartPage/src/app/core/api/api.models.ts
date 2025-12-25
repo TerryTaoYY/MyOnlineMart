@@ -31,6 +31,11 @@ export interface AdminProduct extends BuyerProduct {
 
 export type OrderStatus = 'PROCESSING' | 'COMPLETED' | 'CANCELED';
 
+export interface OrderStatusUpdate {
+  orderId: number;
+  status: OrderStatus;
+}
+
 export interface OrderItem {
   productId: number;
   description: string;
@@ -91,7 +96,6 @@ export interface PagedResponse<T> {
 export interface ProfitSummary {
   productId?: number;
   description?: string;
-  profit?: number;
   totalProfit?: number;
 }
 

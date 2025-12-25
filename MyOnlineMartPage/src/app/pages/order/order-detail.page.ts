@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable, finalize } from 'rxjs';
 import { AdminService } from '../../core/api/admin.service';
 import { BuyerService } from '../../core/api/buyer.service';
-import { AdminOrder, BuyerOrder } from '../../core/api/api.models';
+import { AdminOrder, BuyerOrder, OrderStatusUpdate } from '../../core/api/api.models';
 import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
@@ -62,12 +62,12 @@ export class OrderDetailPage {
       return;
     }
 
-    const request: Observable<AdminOrder | BuyerOrder> = this.isAdmin()
+    const request: Observable<OrderStatusUpdate> = this.isAdmin()
       ? this.adminService.cancelOrder(current.id)
       : this.buyerService.cancelOrder(current.id);
 
     request.subscribe({
-      next: (order: AdminOrder | BuyerOrder) => this.order.set(order),
+      next: (update: OrderStatusUpdate) => this.applyStatusUpdate(update),
       error: (err: unknown) => {
         this.errorMessage.set(this.resolveErrorMessage(err, 'Unable to cancel this order.'));
       }
@@ -89,7 +89,7 @@ export class OrderDetailPage {
     }
 
     this.adminService.completeOrder(current.id).subscribe({
-      next: (order: AdminOrder) => this.order.set(order),
+      next: (update: OrderStatusUpdate) => this.applyStatusUpdate(update),
       error: (err: unknown) => {
         this.errorMessage.set(this.resolveErrorMessage(err, 'Unable to complete this order.'));
       }
@@ -116,5 +116,15 @@ export class OrderDetailPage {
       }
     }
     return fallback;
+  }
+
+  private applyStatusUpdate(update: OrderStatusUpdate) {
+    const current = this.order();
+    if (current && current.id === update.orderId) {
+      this.order.set({ ...current, status: update.status });
+      return;
+    }
+
+    this.loadOrder(update.orderId);
   }
 }
