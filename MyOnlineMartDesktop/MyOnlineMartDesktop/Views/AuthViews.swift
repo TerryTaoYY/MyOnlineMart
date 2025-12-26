@@ -13,18 +13,24 @@ struct AuthRootView: View {
     @State private var mode: AuthMode = .login
 
     var body: some View {
-        HStack(spacing: 28) {
+        let cardWidth: CGFloat = 440
+        let cardMinHeight: CGFloat = 420
+
+        HStack(spacing: 32) {
             AuthBrandPanel()
                 .frame(width: 320)
 
             CardContainer {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 18) {
+                    authHeader
+                    Divider()
                     Picker("", selection: $mode) {
                         ForEach(AuthMode.allCases) { mode in
                             Text(mode.rawValue).tag(mode)
                         }
                     }
                     .pickerStyle(.segmented)
+                    .controlSize(.large)
 
                     if mode == .login {
                         AuthLoginForm(viewModel: viewModel, session: session)
@@ -32,10 +38,12 @@ struct AuthRootView: View {
                         AuthRegisterForm(viewModel: viewModel, session: session)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(width: 360)
+            .frame(minWidth: cardWidth, maxWidth: cardWidth, minHeight: cardMinHeight, maxHeight: .infinity, alignment: .topLeading)
         }
         .padding(40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .alert("Unable to continue", isPresented: errorBinding) {
             Button("OK", role: .cancel) {
                 viewModel.errorMessage = nil
@@ -50,6 +58,54 @@ struct AuthRootView: View {
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )
+    }
+
+    private var headerTitle: String {
+        switch mode {
+        case .login:
+            return "Welcome back"
+        case .register:
+            return "Create account"
+        }
+    }
+
+    private var headerSubtitle: String {
+        switch mode {
+        case .login:
+            return "Use your username or email to continue."
+        case .register:
+            return "Join the Super Duper Mart experience."
+        }
+    }
+
+    private var headerSymbol: String {
+        switch mode {
+        case .login:
+            return "lock.fill"
+        case .register:
+            return "person.crop.circle.badge.plus"
+        }
+    }
+
+    private var authHeader: some View {
+        HStack(alignment: .center, spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(AppTheme.accentSoft)
+                    .frame(width: 44, height: 44)
+                Image(systemName: headerSymbol)
+                    .foregroundColor(AppTheme.accent)
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(headerTitle)
+                    .font(AppFont.display(22))
+                    .foregroundColor(AppTheme.textPrimary)
+                Text(headerSubtitle)
+                    .font(AppFont.body(13))
+                    .foregroundColor(AppTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
@@ -102,9 +158,7 @@ struct AuthLoginForm: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Welcome back", subtitle: "Use your username or email to continue.")
-
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Username or Email")
                     .font(AppFont.caption(12))
                 TextField("buyer1", text: $viewModel.usernameOrEmail)
@@ -114,6 +168,7 @@ struct AuthLoginForm: View {
                 SecureField("Password", text: $viewModel.password)
                     .textFieldStyle(.roundedBorder)
             }
+            .controlSize(.large)
 
             Button {
                 Task { await viewModel.login(session: session) }
@@ -124,6 +179,7 @@ struct AuthLoginForm: View {
                     Text("Sign In")
                 }
             }
+            .frame(maxWidth: .infinity)
             .buttonStyle(PrimaryButtonStyle())
         }
     }
@@ -135,9 +191,7 @@ struct AuthRegisterForm: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            SectionHeader(title: "Create account", subtitle: "Join the Super Duper Mart experience.")
-
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Username")
                     .font(AppFont.caption(12))
                 TextField("buyer1", text: $viewModel.registerUsername)
@@ -151,6 +205,7 @@ struct AuthRegisterForm: View {
                 SecureField("Password", text: $viewModel.registerPassword)
                     .textFieldStyle(.roundedBorder)
             }
+            .controlSize(.large)
 
             Button {
                 Task { await viewModel.register(session: session) }
@@ -161,6 +216,7 @@ struct AuthRegisterForm: View {
                     Text("Create Account")
                 }
             }
+            .frame(maxWidth: .infinity)
             .buttonStyle(PrimaryButtonStyle())
         }
     }

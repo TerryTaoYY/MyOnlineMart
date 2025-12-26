@@ -129,27 +129,63 @@ struct ProductCardView: View {
 }
 
 struct ProductDetailView: View {
-    let product: BuyerProduct
+    let productId: Int
+    let initialProduct: BuyerProduct?
+    @StateObject private var viewModel = BuyerProductDetailViewModel()
     @EnvironmentObject private var cart: CartStore
+    @EnvironmentObject private var session: AppSession
     @State private var quantity = 1
+
+    init(product: BuyerProduct) {
+        productId = product.id
+        initialProduct = product
+    }
+
+    init(productId: Int) {
+        self.productId = productId
+        initialProduct = nil
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            SectionHeader(title: product.description, subtitle: "Premium pick for your cart.")
+            if let product = viewModel.product ?? initialProduct {
+                SectionHeader(title: product.description, subtitle: "Premium pick for your cart.")
 
-            HStack(spacing: 12) {
-                PriceTag(amount: product.retailPrice)
-                Stepper("Qty: \(quantity)", value: $quantity, in: 1...99)
+                HStack(spacing: 12) {
+                    PriceTag(amount: product.retailPrice)
+                    Stepper("Qty: \(quantity)", value: $quantity, in: 1...99)
+                }
+
+                Button("Add to Cart") {
+                    cart.add(product: product, quantity: quantity)
+                }
+                .buttonStyle(PrimaryButtonStyle())
+
+                Spacer()
+            } else if viewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else {
+                EmptyStateView(title: "Product unavailable", message: "We could not load this product.", symbol: "cart.badge.questionmark")
             }
-
-            Button("Add to Cart") {
-                cart.add(product: product, quantity: quantity)
-            }
-            .buttonStyle(PrimaryButtonStyle())
-
-            Spacer()
         }
         .padding(24)
+        .task {
+            guard let token = session.token else { return }
+            await viewModel.load(token: token, productId: productId)
+        }
+        .alert("Unable to load product", isPresented: errorBinding) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
+        }
+    }
+
+    private var errorBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )
     }
 }
 
@@ -334,23 +370,39 @@ struct BuyerOrderDetailView: View {
         VStack(alignment: .leading, spacing: 16) {
             if let order = viewModel.order {
                 SectionHeader(title: "Order #\(order.id)", subtitle: "Placed \(order.placedAt.formatted(date: .abbreviated, time: .shortened))")
-                StatusBadge(status: order.status)
-                    .padding(.bottom, 8)
+                HStack(spacing: 12) {
+                    StatusBadge(status: order.status)
+                    if order.status == .processing {
+                        Button("Cancel") {
+                            Task {
+                                guard let token = session.token else { return }
+                                await viewModel.cancelOrder(token: token, orderId: order.id)
+                            }
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                    }
+                }
+                .padding(.bottom, 8)
 
                 List(order.items) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.description)
-                                .font(AppFont.title(14))
-                            Text(item.unitRetailPrice, format: .currency(code: "USD"))
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
+                    NavigationLink {
+                        ProductDetailView(productId: item.productId)
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(item.description)
+                                    .font(AppFont.title(14))
+                                Text(item.unitRetailPrice, format: .currency(code: "USD"))
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            }
+                            Spacer()
+                            Text("x\(item.quantity)")
+                                .font(AppFont.title(13))
                         }
-                        Spacer()
-                        Text("x\(item.quantity)")
-                            .font(AppFont.title(13))
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
+                    .buttonStyle(.plain)
                 }
                 .listStyle(.plain)
             } else if viewModel.isLoading {
@@ -448,11 +500,13 @@ struct BuyerInsightsView: View {
     @EnvironmentObject private var session: AppSession
 
     var body: some View {
+        let maxInsightsCardWidth: CGFloat = 600
+
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Buyer insights", subtitle: "Your favorites and latest picks.")
 
-                HStack(alignment: .top, spacing: 16) {
+                VStack(spacing: 16) {
                     CardContainer {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Top 3 frequent")
@@ -465,14 +519,20 @@ struct BuyerInsightsView: View {
                                 ForEach(viewModel.topFrequent) { item in
                                     HStack {
                                         Text(item.description)
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
                                         Spacer()
                                         Text("x\(item.totalQuantity)")
+                                            .monospacedDigit()
                                     }
                                     .font(AppFont.body(13))
                                 }
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    //.frame(maxWidth: .infinity, alignment: .leading)
+
                     CardContainer {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Top 3 recent")
@@ -485,15 +545,21 @@ struct BuyerInsightsView: View {
                                 ForEach(viewModel.topRecent) { item in
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(item.description)
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
                                         Text(item.lastPurchasedAt, format: .dateTime.month().day().hour().minute())
                                             .font(AppFont.caption(11))
                                             .foregroundColor(AppTheme.textSecondary)
                                     }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
+                .frame(maxWidth: maxInsightsCardWidth)
+                .frame(maxWidth: .infinity, alignment: .center)
             }
             .padding(24)
         }

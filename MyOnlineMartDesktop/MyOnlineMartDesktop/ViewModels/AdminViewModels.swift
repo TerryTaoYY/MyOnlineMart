@@ -40,6 +40,14 @@ final class AdminProductsViewModel: ObservableObject {
             return nil
         }
     }
+
+    func applyUpdate(_ product: AdminProduct) {
+        if let index = products.firstIndex(where: { $0.id == product.id }) {
+            products[index] = product
+        } else {
+            products.append(product)
+        }
+    }
 }
 
 @MainActor
@@ -132,6 +140,34 @@ final class AdminSummaryViewModel: ObservableObject {
             totalSold = total
         } catch {
             errorMessage = error.userMessage
+        }
+    }
+}
+
+@MainActor
+final class AdminProductDetailViewModel: ObservableObject {
+    @Published var product: AdminProduct?
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    func load(token: String, productId: Int) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            product = try await APIService.shared.adminProductDetail(token: token, productId: productId)
+        } catch {
+            errorMessage = error.userMessage
+        }
+    }
+
+    func update(token: String, productId: Int, request: AdminProductUpdateRequest) async -> AdminProduct? {
+        do {
+            let updated = try await APIService.shared.updateAdminProduct(token: token, productId: productId, requestBody: request)
+            product = updated
+            return updated
+        } catch {
+            errorMessage = error.userMessage
+            return nil
         }
     }
 }

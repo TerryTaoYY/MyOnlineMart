@@ -12,7 +12,7 @@ out/
 # ---------- Backend: Spring Boot (Maven/Gradle) ----------
 # Maven
 MyOnlineMart/target/
-# Gradle（如用）
+# Gradle
 MyOnlineMart/build/
 MyOnlineMart/.gradle/
 
@@ -22,5 +22,42 @@ MyOnlineMartPage/dist/
 MyOnlineMartPage/.angular/
 MyOnlineMartPage/.cache/
 
-# env files（按需）
+# env files（On Demand）
 **/.env
+
+# =========================
+# Xcode / Swift / SwiftUI
+# =========================
+
+# Xcode user-specific settings
+**/xcuserdata/
+**/*.xcuserstate
+
+# Xcode build outputs (in case generated inside repo)
+**/DerivedData/
+**/build/
+
+# Xcode source control files (optional ignore)
+**/*.xccheckout
+**/*.xcscmblueprint
+
+# macOS / Xcode artifacts
+**/*.dSYM
+**/*.dSYM.zip
+**/*.xcarchive
+
+# =========================
+# Swift Package Manager
+# =========================
+**/.build/
+**/.swiftpm/
+
+DerivedData/
+_DerivedData/
+*.xcuserstate
+*.xcuserdata/
+ModuleCache.noindex/
+SDKStatCaches.noindex/
+
+# Swift / Xcode build
+.build/

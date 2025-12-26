@@ -6,99 +6,152 @@ struct AdminDashboardView: View {
     @EnvironmentObject private var session: AppSession
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                SectionHeader(title: "Admin dashboard", subtitle: "Monitor orders, stock, and sales health.")
+        let metricCardMinHeight: CGFloat = 96
 
-                HStack(alignment: .top, spacing: 16) {
-                    CardContainer {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Top profit")
-                                .font(AppFont.title(15))
-                            if let summary = summaryModel.profitSummary {
-                                Text(summary.description)
-                                    .font(AppFont.body(13))
-                                Text(summary.totalProfit, format: .currency(code: "USD"))
-                                    .font(AppFont.display(18))
-                            } else {
-                                Text("No data yet")
-                                    .font(AppFont.caption(12))
-                                    .foregroundColor(AppTheme.textSecondary)
-                            }
-                        }
-                    }
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    SectionHeader(title: "Admin dashboard", subtitle: "Monitor orders, stock, and sales health.")
 
-                    CardContainer {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Total sold")
-                                .font(AppFont.title(15))
-                            if let totalSold = summaryModel.totalSold {
-                                Text("\(totalSold.totalItems) items")
-                                    .font(AppFont.display(18))
-                            } else {
-                                Text("No data yet")
-                                    .font(AppFont.caption(12))
-                                    .foregroundColor(AppTheme.textSecondary)
-                            }
-                        }
-                    }
-
-                    CardContainer {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Top products")
-                                .font(AppFont.title(15))
-                            if summaryModel.popularItems.isEmpty {
-                                Text("No data yet")
-                                    .font(AppFont.caption(12))
-                                    .foregroundColor(AppTheme.textSecondary)
-                            } else {
-                                ForEach(summaryModel.popularItems.prefix(3)) { item in
-                                    HStack {
-                                        Text(item.description)
-                                        Spacer()
-                                        Text("x\(item.totalQuantity)")
-                                    }
-                                    .font(AppFont.body(13))
-                                }
-                            }
-                        }
-                    }
-                }
-
-                CardContainer {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Recent orders")
-                            .font(AppFont.title(16))
-                        if ordersModel.orders.isEmpty {
-                            Text("No orders yet")
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
-                        } else {
-                            ForEach(ordersModel.orders.prefix(5)) { order in
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Order #\(order.id)")
+                    HStack(alignment: .top, spacing: 16) {
+                        HStack(alignment: .top, spacing: 16) {
+                            CardContainer {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("Top profit")
+                                        .font(AppFont.title(15))
+                                    if let summary = summaryModel.profitSummary {
+                                        Text(summary.description)
                                             .font(AppFont.body(13))
-                                        Text(order.buyerUsername)
-                                            .font(AppFont.caption(11))
+                                            .lineLimit(2)
+                                        Text(summary.totalProfit, format: .currency(code: "USD"))
+                                            .font(AppFont.display(18))
+                                    } else {
+                                        Text("No data yet")
+                                            .font(AppFont.caption(12))
                                             .foregroundColor(AppTheme.textSecondary)
                                     }
-                                    Spacer()
-                                    StatusBadge(status: order.status)
                                 }
-                                .padding(.vertical, 4)
+                                .frame(maxWidth: .infinity, minHeight: metricCardMinHeight, alignment: .topLeading)
+                            }
+                            .frame(maxWidth: .infinity)
+
+                            CardContainer {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("Total sold")
+                                        .font(AppFont.title(15))
+                                    if let totalSold = summaryModel.totalSold {
+                                        Text("\(totalSold.totalItems) items")
+                                            .font(AppFont.display(18))
+                                    } else {
+                                        Text("No data yet")
+                                            .font(AppFont.caption(12))
+                                            .foregroundColor(AppTheme.textSecondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, minHeight: metricCardMinHeight, alignment: .topLeading)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        CardContainer {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Top products")
+                                    .font(AppFont.title(15))
+                                if summaryModel.popularItems.isEmpty {
+                                    Text("No data yet")
+                                        .font(AppFont.caption(12))
+                                        .foregroundColor(AppTheme.textSecondary)
+                                } else {
+                                    ForEach(summaryModel.popularItems.prefix(3)) { item in
+                                        HStack {
+                                            Text(item.description)
+                                                .lineLimit(1)
+                                                .truncationMode(.tail)
+                                            Spacer()
+                                            Text("x\(item.totalQuantity)")
+                                                .monospacedDigit()
+                                        }
+                                        .font(AppFont.body(13))
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity, minHeight: metricCardMinHeight, alignment: .topLeading)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+
+                    CardContainer {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Recent orders")
+                                .font(AppFont.title(16))
+                            if ordersModel.orders.isEmpty {
+                                Text("No orders yet")
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            } else {
+                                ForEach(ordersModel.orders.prefix(5)) { order in
+                                    HStack(alignment: .center, spacing: 12) {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Order #\(order.id)")
+                                                .font(AppFont.body(13))
+                                            Text(order.buyerUsername)
+                                                .font(AppFont.caption(11))
+                                                .foregroundColor(AppTheme.textSecondary)
+                                            Text(order.placedAt, format: .dateTime.month().day().hour().minute())
+                                                .font(AppFont.caption(11))
+                                                .foregroundColor(AppTheme.textSecondary)
+                                        }
+                                        Spacer()
+                                        StatusBadge(status: order.status)
+                                        NavigationLink("View", value: order)
+                                            .buttonStyle(SecondaryButtonStyle())
+                                        if order.status == .processing {
+                                            Button("Complete") {
+                                                Task {
+                                                    guard let token = session.token else { return }
+                                                    await ordersModel.complete(token: token, orderId: order.id)
+                                                }
+                                            }
+                                            .buttonStyle(PrimaryButtonStyle())
+                                            Button("Cancel") {
+                                                Task {
+                                                    guard let token = session.token else { return }
+                                                    await ordersModel.cancel(token: token, orderId: order.id)
+                                                }
+                                            }
+                                            .buttonStyle(SecondaryButtonStyle())
+                                        }
+                                    }
+                                    .padding(.vertical, 4)
+                                }
                             }
                         }
                     }
                 }
+                .padding(24)
+                .navigationDestination(for: AdminOrderSummary.self) { order in
+                    AdminOrderDetailView(orderId: order.id)
+                }
             }
-            .padding(24)
         }
         .task {
             guard let token = session.token else { return }
             await summaryModel.load(token: token)
             await ordersModel.load(token: token)
         }
+        .alert("Unable to update orders", isPresented: orderErrorBinding) {
+            Button("OK", role: .cancel) { ordersModel.errorMessage = nil }
+        } message: {
+            Text(ordersModel.errorMessage ?? "Unknown error")
+        }
+    }
+
+    private var orderErrorBinding: Binding<Bool> {
+        Binding(
+            get: { ordersModel.errorMessage != nil },
+            set: { if !$0 { ordersModel.errorMessage = nil } }
+        )
     }
 }
 
@@ -108,49 +161,58 @@ struct AdminProductsView: View {
     @State private var editorMode: ProductEditorMode?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                SectionHeader(title: "Product listings", subtitle: "Manage descriptions, pricing, and inventory.")
-                Spacer()
-                Button("Add Product") {
-                    editorMode = .create
-                }
-                .buttonStyle(PrimaryButtonStyle())
-            }
-
-            if viewModel.isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            } else if viewModel.products.isEmpty {
-                EmptyStateView(title: "No products", message: "Create your first listing.", symbol: "shippingbox")
-                    .frame(maxWidth: .infinity)
-            } else {
-                List(viewModel.products) { product in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(product.description)
-                                .font(AppFont.title(14))
-                            Text("Wholesale \(product.wholesalePrice, format: .currency(code: "USD"))")
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
-                            Text("Retail \(product.retailPrice, format: .currency(code: "USD"))")
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
-                        }
-                        Spacer()
-                        Text("Stock \(product.stockQuantity)")
-                            .font(AppFont.body(13))
-                        Button("Edit") {
-                            editorMode = .edit(product)
-                        }
-                        .buttonStyle(SecondaryButtonStyle())
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    SectionHeader(title: "Product listings", subtitle: "Manage descriptions, pricing, and inventory.")
+                    Spacer()
+                    Button("Add Product") {
+                        editorMode = .create
                     }
-                    .padding(.vertical, 6)
+                    .buttonStyle(PrimaryButtonStyle())
                 }
-                .listStyle(.inset)
+
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                } else if viewModel.products.isEmpty {
+                    EmptyStateView(title: "No products", message: "Create your first listing.", symbol: "shippingbox")
+                        .frame(maxWidth: .infinity)
+                } else {
+                    List(viewModel.products) { product in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(product.description)
+                                    .font(AppFont.title(14))
+                                Text("Wholesale \(product.wholesalePrice, format: .currency(code: "USD"))")
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
+                                Text("Retail \(product.retailPrice, format: .currency(code: "USD"))")
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            }
+                            Spacer()
+                            Text("Stock \(product.stockQuantity)")
+                                .font(AppFont.body(13))
+                            NavigationLink("View", value: product)
+                                .buttonStyle(SecondaryButtonStyle())
+                            Button("Edit") {
+                                editorMode = .edit(product)
+                            }
+                            .buttonStyle(SecondaryButtonStyle())
+                        }
+                        .padding(.vertical, 6)
+                    }
+                    .listStyle(.inset)
+                }
+            }
+            .padding(24)
+            .navigationDestination(for: AdminProduct.self) { product in
+                AdminProductDetailView(productId: product.id, initialProduct: product) { updated in
+                    viewModel.applyUpdate(updated)
+                }
             }
         }
-        .padding(24)
         .task {
             guard let token = session.token else { return }
             await viewModel.load(token: token)
@@ -229,42 +291,11 @@ struct AdminOrdersView: View {
                     EmptyStateView(title: "No orders", message: "Orders will appear once buyers start shopping.", symbol: "tray")
                         .frame(maxWidth: .infinity)
                 } else {
-                    List(viewModel.orders) { order in
-                        NavigationLink(value: order) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Order #\(order.id)")
-                                        .font(AppFont.title(14))
-                                    Text(order.buyerUsername)
-                                        .font(AppFont.caption(12))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                }
-                                Spacer()
-                                StatusBadge(status: order.status)
-                                if order.status == .processing {
-                                    Button("Complete") {
-                                        Task {
-                                            guard let token = session.token else { return }
-                                            await viewModel.complete(token: token, orderId: order.id)
-                                        }
-                                    }
-                                    .buttonStyle(PrimaryButtonStyle())
-                                    Button("Cancel") {
-                                        Task {
-                                            guard let token = session.token else { return }
-                                            await viewModel.cancel(token: token, orderId: order.id)
-                                        }
-                                    }
-                                    .buttonStyle(SecondaryButtonStyle())
-                                }
-                            }
-                            .padding(.vertical, 6)
-                        }
-                    }
-                    .listStyle(.inset)
+                    ordersListView
                 }
             }
             .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .navigationDestination(for: AdminOrderSummary.self) { order in
                 AdminOrderDetailView(orderId: order.id)
             }
@@ -285,6 +316,57 @@ struct AdminOrdersView: View {
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )
+    }
+
+    private var ordersListView: some View {
+        CardContainer {
+            VStack(spacing: 0) {
+                ForEach(Array(viewModel.orders.enumerated()), id: \.element.id) { index, order in
+                    orderRow(order)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if index < viewModel.orders.count - 1 {
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+
+    private func orderRow(_ order: AdminOrderSummary) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Order #\(order.id)")
+                    .font(AppFont.title(14))
+                Text(order.buyerUsername)
+                    .font(AppFont.caption(12))
+                    .foregroundColor(AppTheme.textSecondary)
+                    .lineLimit(1)
+                Text(order.placedAt, format: .dateTime.month().day().hour().minute())
+                    .font(AppFont.caption(11))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
+            Spacer()
+            StatusBadge(status: order.status)
+            NavigationLink("View", value: order)
+                .buttonStyle(SecondaryButtonStyle())
+            if order.status == .processing {
+                Button("Complete") {
+                    Task {
+                        guard let token = session.token else { return }
+                        await viewModel.complete(token: token, orderId: order.id)
+                    }
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                Button("Cancel") {
+                    Task {
+                        guard let token = session.token else { return }
+                        await viewModel.cancel(token: token, orderId: order.id)
+                    }
+                }
+                .buttonStyle(SecondaryButtonStyle())
+            }
+        }
+        .padding(.vertical, 8)
     }
 }
 
@@ -344,66 +426,166 @@ struct AdminOrderDetailView: View {
     }
 }
 
+struct AdminProductDetailView: View {
+    let productId: Int
+    let initialProduct: AdminProduct?
+    let onProductUpdated: ((AdminProduct) -> Void)?
+    @StateObject private var viewModel = AdminProductDetailViewModel()
+    @EnvironmentObject private var session: AppSession
+    @State private var editorMode: ProductEditorMode?
+
+    init(productId: Int, initialProduct: AdminProduct? = nil, onProductUpdated: ((AdminProduct) -> Void)? = nil) {
+        self.productId = productId
+        self.initialProduct = initialProduct
+        self.onProductUpdated = onProductUpdated
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if let product = viewModel.product ?? initialProduct {
+                HStack(alignment: .top) {
+                    SectionHeader(title: product.description, subtitle: "Product #\(product.id)")
+                    Spacer()
+                    Button("Edit") {
+                        editorMode = .edit(product)
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                }
+
+                CardContainer {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Wholesale \(product.wholesalePrice, format: .currency(code: "USD"))")
+                            .font(AppFont.title(14))
+                        Text("Retail \(product.retailPrice, format: .currency(code: "USD"))")
+                            .font(AppFont.title(14))
+                        Text("Stock \(product.stockQuantity)")
+                            .font(AppFont.body(13))
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                }
+            } else if viewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else {
+                EmptyStateView(title: "Product not found", message: "We could not load this product.", symbol: "exclamationmark.triangle")
+            }
+        }
+        .padding(24)
+        .task {
+            guard let token = session.token else { return }
+            await viewModel.load(token: token, productId: productId)
+        }
+        .sheet(item: $editorMode) { mode in
+            ProductEditorView(mode: mode) { values in
+                Task {
+                    guard let token = session.token else { return }
+                    let request = AdminProductUpdateRequest(
+                        description: values.description,
+                        wholesalePrice: values.wholesalePrice,
+                        retailPrice: values.retailPrice,
+                        stockQuantity: values.stockQuantity
+                    )
+                    if let updated = await viewModel.update(token: token, productId: productId, request: request) {
+                        onProductUpdated?(updated)
+                    }
+                }
+            }
+            .frame(minWidth: 420, minHeight: 360)
+        }
+        .alert("Unable to load product", isPresented: errorBinding) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
+        }
+    }
+
+    private var errorBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )
+    }
+}
+
 struct AdminSummaryView: View {
     @StateObject private var viewModel = AdminSummaryViewModel()
     @EnvironmentObject private var session: AppSession
 
     var body: some View {
+        let highlightCardMinHeight: CGFloat = 96
+
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Sales summary", subtitle: "Profit, popularity, and totals.")
 
-                CardContainer {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Most profitable product")
-                            .font(AppFont.title(15))
-                        if let profit = viewModel.profitSummary {
-                            Text(profit.description)
-                                .font(AppFont.title(14))
-                            Text(profit.totalProfit, format: .currency(code: "USD"))
-                                .font(AppFont.display(18))
-                        } else {
-                            Text("No completed orders yet")
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
-                        }
-                    }
-                }
-
-                CardContainer {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Top 3 popular products")
-                            .font(AppFont.title(15))
-                        if viewModel.popularItems.isEmpty {
-                            Text("No completed orders yet")
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
-                        } else {
-                            ForEach(viewModel.popularItems.prefix(3)) { item in
-                                HStack {
-                                    Text(item.description)
-                                    Spacer()
-                                    Text("x\(item.totalQuantity)")
-                                }
-                                .font(AppFont.body(13))
+                HStack(alignment: .top, spacing: 16) {
+                    CardContainer {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Most profitable product")
+                                .font(AppFont.title(15))
+                            if let profit = viewModel.profitSummary {
+                                Text(profit.description)
+                                    .font(AppFont.title(14))
+                                    .lineLimit(2)
+                                Text(profit.totalProfit, format: .currency(code: "USD"))
+                                    .font(AppFont.display(18))
+                            } else {
+                                Text("No completed orders yet")
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
                             }
                         }
+                        .frame(maxWidth: .infinity, minHeight: highlightCardMinHeight, alignment: .topLeading)
                     }
+                    .frame(maxWidth: .infinity)
+
+                    CardContainer {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Total items sold")
+                                .font(AppFont.title(15))
+                            if let total = viewModel.totalSold {
+                                Text("\(total.totalItems) items")
+                                    .font(AppFont.display(18))
+                            } else {
+                                Text("No completed orders yet")
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: highlightCardMinHeight, alignment: .topLeading)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
 
-                CardContainer {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Total items sold")
-                            .font(AppFont.title(15))
-                        if let total = viewModel.totalSold {
-                            Text("\(total.totalItems) items")
-                                .font(AppFont.display(18))
-                        } else {
-                            Text("No completed orders yet")
-                                .font(AppFont.caption(12))
-                                .foregroundColor(AppTheme.textSecondary)
+                HStack(alignment: .top, spacing: 16) {
+                    CardContainer {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Top 3 popular products")
+                                .font(AppFont.title(15))
+                            if viewModel.popularItems.isEmpty {
+                                Text("No completed orders yet")
+                                    .font(AppFont.caption(12))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            } else {
+                                ForEach(viewModel.popularItems.prefix(3)) { item in
+                                    HStack {
+                                        Text(item.description)
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
+                                        Spacer()
+                                        Text("x\(item.totalQuantity)")
+                                            .monospacedDigit()
+                                    }
+                                    .font(AppFont.body(13))
+                                }
+                            }
                         }
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
                     }
+                    .frame(maxWidth: .infinity)
+
+                    Color.clear
+                        .frame(maxWidth: .infinity)
                 }
             }
             .padding(24)

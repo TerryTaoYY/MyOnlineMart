@@ -106,6 +106,10 @@ final class APIService {
         try await request(path: "/api/admin/products", method: "GET", token: token)
     }
 
+    func adminProductDetail(token: String, productId: Int) async throws -> AdminProduct {
+        try await request(path: "/api/admin/products/\(productId)", method: "GET", token: token)
+    }
+
     func createAdminProduct(token: String, requestBody: AdminProductCreateRequest) async throws -> AdminProduct {
         try await request(path: "/api/admin/products", method: "POST", token: token, body: requestBody)
     }

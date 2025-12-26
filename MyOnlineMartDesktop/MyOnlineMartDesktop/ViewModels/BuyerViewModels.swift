@@ -86,6 +86,22 @@ final class BuyerOrderDetailViewModel: ObservableObject {
             errorMessage = error.userMessage
         }
     }
+
+    func cancelOrder(token: String, orderId: Int) async {
+        do {
+            let response = try await APIService.shared.cancelBuyerOrder(token: token, orderId: orderId)
+            if let existing = order {
+                order = BuyerOrder(
+                    id: existing.id,
+                    placedAt: existing.placedAt,
+                    status: response.status,
+                    items: existing.items
+                )
+            }
+        } catch {
+            errorMessage = error.userMessage
+        }
+    }
 }
 
 @MainActor
@@ -130,6 +146,23 @@ final class BuyerInsightsViewModel: ObservableObject {
             let (frequent, recent) = try await (frequentTask, recentTask)
             topFrequent = frequent
             topRecent = recent
+        } catch {
+            errorMessage = error.userMessage
+        }
+    }
+}
+
+@MainActor
+final class BuyerProductDetailViewModel: ObservableObject {
+    @Published var product: BuyerProduct?
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    func load(token: String, productId: Int) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            product = try await APIService.shared.buyerProductDetail(token: token, productId: productId)
         } catch {
             errorMessage = error.userMessage
         }
